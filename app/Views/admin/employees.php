@@ -1,273 +1,270 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Employees — Vertex Admin</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        :root {
-            --bg: #f8fafc;
-            --fg: #18181b;
-            --primary: #6366f1;
-            --primary-dark: #4338ca;
-            --sidebar-bg: #fff;
-            --border: #e5e7eb;
-            --sidebar-active: #f1f5f9;
-            --card-bg: #fff;
-            --radius: 0.5rem;
-            --danger: #ef4444;
-            --muted: #52525b;
-        }
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            background: var(--bg);
-            color: var(--fg);
-            font-family: 'Inter', Arial, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-        }
-        .sidebar {
-            width: 220px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            min-height: 100vh;
-            padding: 2rem 0 0 0;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-        .sidebar h2 { text-align: center; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0 0 1rem 0; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar ul li {
-            padding: 0.75rem 2rem;
-            color: var(--fg);
-            border-left: 4px solid transparent;
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s;
-            font-size: 0.95rem;
-        }
-        .sidebar ul li.active, .sidebar ul li:hover {
-            background: var(--sidebar-active);
-            border-left-color: var(--primary);
-            color: var(--primary);
-        }
-        .main { flex: 1; padding: 2.5rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
-        .page-header { display: flex; align-items: center; justify-content: space-between; }
-        .page-header h1 { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
-        /* Filter tabs */
-        .filter-tabs {
-            display: flex;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            width: fit-content;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-        }
-        .tab-btn {
-            padding: 0.55rem 1.5rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-decoration: none;
-            transition: background 0.15s, color 0.15s;
-            border-right: 1px solid var(--border);
-        }
-        .tab-btn:last-child { border-right: none; }
-        .tab-btn:hover { background: var(--sidebar-active); color: var(--primary); }
-        .tab-btn.active { background: var(--primary); color: #fff; }
-        /* Buttons */
-        .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; border: none; transition: background 0.15s; }
-        .btn-primary  { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-secondary { background: #e0e7ff; color: var(--primary); }
-        .btn-secondary:hover { background: #c7d2fe; }
-        .btn-danger   { background: #fee2e2; color: var(--danger); }
-        .btn-danger:hover { background: #fecaca; }
-        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.82rem; }
-        /* Card */
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1.75rem; }
-        .card h2 { margin: 0 0 1.25rem 0; font-size: 1.1rem; color: var(--fg); }
-        /* Form */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-        .form-group.full { grid-column: 1 / -1; }
-        label { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-        input[type="text"], input[type="email"], input[type="url"], textarea {
-            padding: 0.55rem 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-family: inherit;
-            font-size: 0.95rem;
-            color: var(--fg);
-            background: #fafafa;
-            transition: border-color 0.15s;
-            width: 100%;
-        }
-        input:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
-        textarea { resize: vertical; min-height: 80px; }
-        .form-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
-        .img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--border); margin-top: 0.25rem; }
-        /* Table */
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        thead th { text-align: left; padding: 0.6rem 0.75rem; background: var(--bg); border-bottom: 2px solid var(--border); font-weight: 600; color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
-        tbody tr { border-bottom: 1px solid var(--border); }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #fafafa; }
-        tbody td { padding: 0.75rem; vertical-align: middle; }
-        .tbl-img { width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); }
-        .tbl-img-placeholder { width: 48px; height: 48px; background: #e0e7ff; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); }
-        .actions { display: flex; gap: 0.5rem; }
-        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.95rem; }
-    </style>
-</head>
-<body>
+<?php include __DIR__ . '/../partials/header.php'; ?>
 
-<?php
-$activePage = 'employees';
-include __DIR__ . '/_sidebar.php';
-$typeLabel = $filter === 'top' ? 'Top' : 'Regular';
-?>
+<div class="page-header">
+    <h1 class="page-title">Employees</h1>
+    <p class="page-subtitle">Manage and view registered employees.</p>
+</div>
 
-<div class="main">
-    <div class="page-header">
-        <h1>Employees</h1>
-        <?php if ($action !== 'new' && $action !== 'edit'): ?>
-        <a href="?employees&filter=<?= $filter ?>&action=new" class="btn btn-primary">
-            + Add <?= $typeLabel ?> Employee
-        </a>
-        <?php endif; ?>
-    </div>
-
-    <div class="filter-tabs">
-        <a href="?employees&filter=top"
-           class="tab-btn <?= $filter === 'top' ? 'active' : '' ?>">Top Employees</a>
-        <a href="?employees&filter=regular"
-           class="tab-btn <?= $filter === 'regular' ? 'active' : '' ?>">Regular Employees</a>
-    </div>
-
-    <?php if ($action === 'new' || $action === 'edit'): ?>
-    <div class="card">
-        <h2><?= $action === 'edit' ? "Edit {$typeLabel} Employee" : "Add New {$typeLabel} Employee" ?></h2>
-        <form method="POST" action="?employees&filter=<?= $filter ?>" enctype="multipart/form-data">
-            <?php if ($action === 'edit' && $editItem): ?>
-            <input type="hidden" name="id" value="<?= htmlspecialchars($editItem['id']) ?>">
-            <?php endif; ?>
-
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="name">Name <span style="color:var(--danger)">*</span></label>
-                    <input type="text" id="name" name="name" required
-                        value="<?= htmlspecialchars($editItem['name'] ?? '') ?>"
-                        placeholder="Full name">
-                </div>
-                <div class="form-group">
-                    <label for="position">Position <span style="color:var(--danger)">*</span></label>
-                    <input type="text" id="position" name="position" required
-                        value="<?= htmlspecialchars($editItem['position'] ?? '') ?>"
-                        placeholder="e.g. Senior Engineer">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email Link</label>
-                    <input type="email" id="email" name="email"
-                        value="<?= htmlspecialchars($editItem['email'] ?? '') ?>"
-                        placeholder="employee@example.com">
-                </div>
-                <div class="form-group">
-                    <label for="linkedin">LinkedIn Link</label>
-                    <input type="url" id="linkedin" name="linkedin"
-                        value="<?= htmlspecialchars($editItem['linkedin'] ?? '') ?>"
-                        placeholder="https://linkedin.com/in/...">
-                </div>
-                <div class="form-group full">
-                    <label for="description">Description</label>
-                    <textarea id="description" name="description"
-                        placeholder="Brief bio or description..."><?= htmlspecialchars($editItem['description'] ?? '') ?></textarea>
-                </div>
-                <div class="form-group full">
-                    <label for="image">Profile Image</label>
-                    <input type="file" id="image" name="image" accept="image/*">
-                    <?php if (!empty($editItem['image'])): ?>
-                    <img src="<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview">
-                    <small style="color:var(--muted)">Leave blank to keep current image.</small>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <?= $action === 'edit' ? 'Save Changes' : 'Add Employee' ?>
-                </button>
-                <a href="?employees&filter=<?= $filter ?>" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
-    <?php endif; ?>
-
-    <div class="card">
-        <h2><?= $typeLabel ?> Employees (<?= count($employees) ?>)</h2>
-        <?php if (empty($employees)): ?>
-        <div class="empty-state">
-            No <?= strtolower($typeLabel) ?> employees added yet.
-            Click "+ Add <?= $typeLabel ?> Employee" to get started.
+<!-- Actions Bar -->
+<div class="actions-bar">
+    <form action="" method="GET" style="margin: 0;">
+        <input type="hidden" name="employees" value="">
+        <input type="hidden" name="filter" value="<?php echo htmlspecialchars($filter ?? 'top'); ?>">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="q" placeholder="Search employees..." value="<?php echo htmlspecialchars($_GET['q'] ?? ''); ?>">
         </div>
-        <?php else: ?>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Photo</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Email</th>
-                        <th>LinkedIn</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($employees as $emp): ?>
-                <tr>
-                    <td>
-                        <?php if (!empty($emp['image'])): ?>
-                        <img src="<?= htmlspecialchars($emp['image']) ?>" alt="" class="tbl-img">
-                        <?php else: ?>
-                        <div class="tbl-img-placeholder">&#128100;</div>
-                        <?php endif; ?>
-                    </td>
-                    <td><strong><?= htmlspecialchars($emp['name']) ?></strong></td>
-                    <td><?= htmlspecialchars($emp['position']) ?></td>
-                    <td>
-                        <?php if (!empty($emp['email'])): ?>
-                        <a href="mailto:<?= htmlspecialchars($emp['email']) ?>" style="color:var(--primary)">
-                            <?= htmlspecialchars($emp['email']) ?>
-                        </a>
-                        <?php else: ?>—<?php endif; ?>
-                    </td>
-                    <td>
-                        <?php if (!empty($emp['linkedin'])): ?>
-                        <a href="<?= htmlspecialchars($emp['linkedin']) ?>" target="_blank" style="color:var(--primary)">View</a>
-                        <?php else: ?>—<?php endif; ?>
-                    </td>
-                    <td>
-                        <div class="actions">
-                            <a href="?employees&filter=<?= $filter ?>&action=edit&id=<?= urlencode($emp['id']) ?>"
-                               class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="?employees&filter=<?= $filter ?>&action=delete&id=<?= urlencode($emp['id']) ?>"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Delete <?= htmlspecialchars(addslashes($emp['name'])) ?>? This cannot be undone.')">
-                               Delete
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-        <?php endif; ?>
+    </form>
+
+    <div style="display: flex; gap: 10px;">
+        <button id="addEmployeeBtn" class="btn-primary">
+            <i class="fa-solid fa-plus"></i> Add Employee
+        </button>
     </div>
 </div>
-</body>
-</html>
+
+<!-- Content Area -->
+<!-- Employees Table -->
+<div class="card">
+    <div class="card-header">
+        <?php
+        if ($filter === 'top') echo 'Top Employees';
+        elseif ($filter === 'regular') echo 'Regular Employees';
+        else echo 'All Employees';
+        ?>
+    </div>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Description</th>
+                    <th>Email Link</th>
+                    <th>LinkedIn Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                foreach ($employees as $emp):
+                ?>
+                    <tr>
+                        <td>
+                            <div class="avatar" style="background: #e9ecef; color: #333; overflow: hidden; width: 40px; height: 40px;">
+                                <?php if (!empty($emp['image'])): ?>
+                                    <img src="<?php echo htmlspecialchars($emp['image']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                <?php else: ?>
+                                    <?php echo substr($emp['name'], 0, 1); ?>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+                        <td>
+                            <strong><?php echo htmlspecialchars($emp['name']); ?></strong>
+                        </td>
+                        <td><?php echo htmlspecialchars($emp['position'] ?? 'N/A'); ?></td>
+                        <td>
+                            <span title="<?php echo htmlspecialchars($emp['description']); ?>">
+                                <?php echo htmlspecialchars(mb_strimwidth($emp['description'], 0, 50, "...")); ?>
+                            </span>
+                        </td>
+                        <td>
+                            <?php if (!empty($emp['email'])): ?>
+                                <a href="mailto:<?php echo htmlspecialchars($emp['email']); ?>" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                                    <i class="fa-solid fa-envelope"></i> Link
+                                </a>
+                            <?php else: ?>
+                                <span style="color: var(--text-muted);">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (!empty($emp['linkedin'])): ?>
+                                <a href="<?php echo htmlspecialchars($emp['linkedin']); ?>" target="_blank" style="color: #0077b5; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                                    <i class="fa-brands fa-linkedin"></i> LinkedIn
+                                </a>
+                            <?php else: ?>
+                                <span style="color: var(--text-muted);">-</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="icon-btn edit-employee-btn"
+                                    data-id="<?php echo $emp['id']; ?>"
+                                    data-name="<?php echo htmlspecialchars($emp['name']); ?>"
+                                    data-position="<?php echo htmlspecialchars($emp['position'] ?? ''); ?>"
+                                    data-description="<?php echo htmlspecialchars($emp['description'] ?? ''); ?>"
+                                    data-type="<?php echo $filter; ?>"
+                                    data-email="<?php echo htmlspecialchars($emp['email'] ?? ''); ?>"
+                                    data-linkedin="<?php echo htmlspecialchars($emp['linkedin'] ?? ''); ?>"
+                                    data-image="<?php echo htmlspecialchars($emp['image'] ?? ''); ?>"
+                                    title="Edit"
+                                    style="font-size: 0.8rem; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
+                                    Edit
+                                </button>
+                                <button class="icon-btn delete-employee-btn"
+                                    data-id="<?php echo $emp['id']; ?>"
+                                    data-type="<?php echo $filter; ?>"
+                                    title="Delete"
+                                    style="font-size: 0.8rem; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; color: #ef4444;">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+                <?php if (empty($employees)): ?>
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 30px; color: #6c757d;">
+                            No employees found.
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div id="addEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Add Employee</h3>
+            <button class="modal-close" data-modal-close>&times;</button>
+        </div>
+        <div class="modal-body">
+            <form action="?employees&filter=<?php echo $filter; ?>" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="type" value="<?php echo htmlspecialchars($filter); ?>">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Employee Name <span class="required">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position <span class="required">*</span></label>
+                        <input type="text" name="position" class="form-control" placeholder="e.g. Software Engineer" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description <span class="required">*</span></label>
+                    <textarea name="description" class="form-control" rows="2" placeholder="Brief description..." required></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Email Link</label>
+                        <input type="email" name="email" class="form-control" placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn Link</label>
+                        <input type="url" name="linkedin" class="form-control" placeholder="https://linkedin.com/in/...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Employee Image</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" accept="image/*">
+                        <div class="file-input-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click or Drag to Upload Image</span>
+                        </div>
+                    </div>
+                    <p class="form-text">Recommended size: 200x200px. Max size: 2MB.</p>
+                </div>
+
+                <div class="form-actions" style="margin-top: 15px; padding-top: 0; border-top: none;">
+                    <button type="button" class="btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="btn-primary">Save Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div id="editEmployeeModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Employee</h3>
+            <button class="modal-close" data-modal-close>&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editEmployeeForm" action="?employees&filter=<?php echo $filter; ?>" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="edit_emp_id">
+                <input type="hidden" name="type" id="edit_emp_type">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Employee Name <span class="required">*</span></label>
+                        <input type="text" name="name" id="edit_emp_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position <span class="required">*</span></label>
+                        <input type="text" name="position" id="edit_emp_position" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description <span class="required">*</span></label>
+                    <textarea name="description" id="edit_emp_description" class="form-control" rows="2" required></textarea>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Email Link</label>
+                        <input type="email" name="email" id="edit_emp_email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn Link</label>
+                        <input type="url" name="linkedin" id="edit_emp_linkedin" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Employee Image</label>
+                    <div id="current_emp_image_preview" style="margin-bottom: 10px; display: none;">
+                        <img src="" style="max-height: 80px; border-radius: 6px;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image</span>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" accept="image/*">
+                        <div class="file-input-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click or Drag to Upload New Image</span>
+                        </div>
+                    </div>
+                    <p class="form-text">Leave blank to keep current image. Recommended size: 200x200px.</p>
+                </div>
+
+                <div class="form-actions" style="margin-top: 15px; padding-top: 0; border-top: none;">
+                    <button type="button" class="btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="btn-primary">Update Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Employee Modal -->
+<div id="deleteEmployeeModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <div class="modal-body" style="padding: 30px;">
+            <div style="width: 60px; height: 60px; background-color: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 20px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="modal-title" style="margin-bottom: 10px; font-size: 1.25rem;">Delete Employee?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Are you sure you want to delete this employee? This action cannot be undone.</p>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn-secondary" data-modal-close>Cancel</button>
+                <a href="#" id="confirmDeleteEmpBtn" class="btn-primary" style="background-color: #ef4444; border: none; color: white;">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php include __DIR__ . '/../partials/footer.php'; ?>

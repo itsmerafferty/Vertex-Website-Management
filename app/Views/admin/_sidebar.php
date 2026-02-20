@@ -18,10 +18,10 @@ $displayDept = isset($sessionUser['user_department']) ? 'Dept. ' . $sessionUser[
     <h2>Admin</h2>
     <ul>
         <?php foreach ($nav as $key => $label): ?>
-        <li onclick="window.location='?<?= $key ?>'"
-            <?= $activePage === $key ? ' class="active"' : '' ?>>
-            <?= htmlspecialchars($label) ?>
-        </li>
+            <li onclick="window.location='?<?= $key ?>'"
+                <?= $activePage === $key ? ' class="active"' : '' ?>>
+                <?= htmlspecialchars($label) ?>
+            </li>
         <?php endforeach; ?>
     </ul>
 
@@ -30,9 +30,9 @@ $displayDept = isset($sessionUser['user_department']) ? 'Dept. ' . $sessionUser[
             <?= htmlspecialchars($displayName) ?>
         </div>
         <?php if ($displayDept): ?>
-        <div style="font-size:0.78rem;color:#6366f1;margin-bottom:0.6rem;">
-            <?= htmlspecialchars($displayDept) ?>
-        </div>
+            <div style="font-size:0.78rem;color:#6366f1;margin-bottom:0.6rem;">
+                <?= htmlspecialchars($displayDept) ?>
+            </div>
         <?php endif; ?>
         <a href="?logout" style="font-size:0.82rem;color:#ef4444;text-decoration:none;font-weight:500;">
             Sign out

@@ -1,28 +1,33 @@
 <?php
-class CombinedEmployeesController {
+class CombinedEmployeesController
+{
 
     private string $filter;
     private string $storagePath;
     private string $uploadDir;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->uploadDir   = __DIR__ . '/../../public/uploads/';
         $this->filter      = in_array($_GET['filter'] ?? '', ['top', 'regular'])
-                             ? $_GET['filter']
-                             : 'top';
+            ? $_GET['filter']
+            : 'top';
         $this->storagePath = __DIR__ . '/../../storage/' . $this->filter . '_employees.json';
     }
 
-    private function load(): array {
+    private function load(): array
+    {
         if (!file_exists($this->storagePath)) return [];
         return json_decode(file_get_contents($this->storagePath), true) ?: [];
     }
 
-    private function persist(array $data): void {
+    private function persist(array $data): void
+    {
         file_put_contents($this->storagePath, json_encode(array_values($data), JSON_PRETTY_PRINT));
     }
 
-    private function handleUpload(string $field): ?string {
+    private function handleUpload(string $field): ?string
+    {
         if (empty($_FILES[$field]['name'])) return null;
         if (!is_dir($this->uploadDir)) mkdir($this->uploadDir, 0755, true);
         $ext     = strtolower(pathinfo($_FILES[$field]['name'], PATHINFO_EXTENSION));
@@ -35,12 +40,22 @@ class CombinedEmployeesController {
         return null;
     }
 
-    public function index(): void {
+    public function index(): void
+    {
         $employees  = $this->load();
         $filter     = $this->filter;
         $action     = $_GET['action'] ?? 'list';
+        $search     = trim($_GET['q'] ?? '');
         $editItem   = null;
         $activePage = 'employees';
+
+        if ($search) {
+            $employees = array_filter($employees, function ($emp) use ($search) {
+                return stripos($emp['name'], $search) !== false ||
+                    stripos($emp['position'] ?? '', $search) !== false ||
+                    stripos($emp['description'] ?? '', $search) !== false;
+            });
+        }
 
         if ($action === 'delete' && !empty($_GET['id'])) {
             $id        = $_GET['id'];
@@ -52,7 +67,10 @@ class CombinedEmployeesController {
 
         if ($action === 'edit' && !empty($_GET['id'])) {
             foreach ($employees as $emp) {
-                if ($emp['id'] === $_GET['id']) { $editItem = $emp; break; }
+                if ($emp['id'] === $_GET['id']) {
+                    $editItem = $emp;
+                    break;
+                }
             }
         }
 

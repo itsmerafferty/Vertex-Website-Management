@@ -1,247 +1,250 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Testimonials — Vertex Admin</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        :root {
-            --bg: #f8fafc;
-            --fg: #18181b;
-            --primary: #6366f1;
-            --primary-dark: #4338ca;
-            --sidebar-bg: #fff;
-            --border: #e5e7eb;
-            --sidebar-active: #f1f5f9;
-            --card-bg: #fff;
-            --radius: 0.5rem;
-            --danger: #ef4444;
-            --muted: #52525b;
-            --star: #f59e0b;
-        }
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            background: var(--bg);
-            color: var(--fg);
-            font-family: 'Inter', Arial, sans-serif;
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-        }
-        .sidebar {
-            width: 220px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            min-height: 100vh;
-            padding: 2rem 0 0 0;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-        }
-        .sidebar h2 { text-align: center; font-size: 1.25rem; font-weight: 700; color: var(--primary); margin: 0 0 1rem 0; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar ul li {
-            padding: 0.75rem 2rem;
-            color: var(--fg);
-            border-left: 4px solid transparent;
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s;
-            font-size: 0.95rem;
-        }
-        .sidebar ul li.active, .sidebar ul li:hover {
-            background: var(--sidebar-active);
-            border-left-color: var(--primary);
-            color: var(--primary);
-        }
-        .main { flex: 1; padding: 2.5rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
-        .page-header { display: flex; align-items: center; justify-content: space-between; }
-        .page-header h1 { font-size: 1.6rem; font-weight: 700; color: var(--primary); margin: 0; }
-        .btn { display: inline-block; padding: 0.5rem 1.25rem; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; text-decoration: none; border: none; transition: background 0.15s; }
-        .btn-primary  { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .btn-secondary { background: #e0e7ff; color: var(--primary); }
-        .btn-secondary:hover { background: #c7d2fe; }
-        .btn-danger   { background: #fee2e2; color: var(--danger); }
-        .btn-danger:hover { background: #fecaca; }
-        .btn-sm { padding: 0.3rem 0.8rem; font-size: 0.82rem; }
-        .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 1.75rem; }
-        .card h2 { margin: 0 0 1.25rem 0; font-size: 1.1rem; color: var(--fg); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
-        .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
-        .form-group.full { grid-column: 1 / -1; }
-        label { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
-        input[type="text"], select, textarea {
-            padding: 0.55rem 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-family: inherit;
-            font-size: 0.95rem;
-            color: var(--fg);
-            background: #fafafa;
-            transition: border-color 0.15s;
-            width: 100%;
-        }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
-        textarea { resize: vertical; min-height: 90px; }
-        .form-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
-        .img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--border); margin-top: 0.25rem; }
-        .table-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        thead th { text-align: left; padding: 0.6rem 0.75rem; background: var(--bg); border-bottom: 2px solid var(--border); font-weight: 600; color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
-        tbody tr { border-bottom: 1px solid var(--border); }
-        tbody tr:last-child { border-bottom: none; }
-        tbody tr:hover { background: #fafafa; }
-        tbody td { padding: 0.75rem; vertical-align: middle; }
-        .tbl-img { width: 48px; height: 48px; object-fit: cover; border-radius: 50%; border: 2px solid var(--border); }
-        .tbl-img-placeholder { width: 48px; height: 48px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .stars { color: var(--star); font-size: 1rem; letter-spacing: 0.05em; }
-        .testimonial-preview { color: var(--muted); font-size: 0.85rem; max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .tag { display: inline-block; background: #e0e7ff; color: var(--primary); border-radius: 999px; padding: 0.15rem 0.6rem; font-size: 0.78rem; font-weight: 600; }
-        .actions { display: flex; gap: 0.5rem; }
-        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.95rem; }
-    </style>
-</head>
-<body>
+<?php include __DIR__ . '/../partials/header.php'; ?>
 
-<?php
-$activePage = 'testimonials';
-include __DIR__ . '/_sidebar.php';
+<div class="page-header">
+    <h1 class="page-title">Testimonials</h1>
+    <p class="page-subtitle">Manage client testimonials and reviews.</p>
+</div>
 
-function renderStars(int $count): string {
-    return str_repeat('&#9733;', $count) . str_repeat('&#9734;', 5 - $count);
-}
-?>
-
-<div class="main">
-    <div class="page-header">
-        <h1>Testimonials</h1>
-        <?php if ($action !== 'new' && $action !== 'edit'): ?>
-        <a href="?testimonials&action=new" class="btn btn-primary">+ Add Testimonial</a>
-        <?php endif; ?>
-    </div>
-
-    <?php if ($action === 'new' || $action === 'edit'): ?>
-    <div class="card">
-        <h2><?= $action === 'edit' ? 'Edit Testimonial' : 'Add New Testimonial' ?></h2>
-        <form method="POST" action="?testimonials" enctype="multipart/form-data">
-            <?php if ($action === 'edit' && $editItem): ?>
-            <input type="hidden" name="id" value="<?= htmlspecialchars($editItem['id']) ?>">
-            <?php endif; ?>
-
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="name">Name <span style="color:var(--danger)">*</span></label>
-                    <input type="text" id="name" name="name" required
-                        value="<?= htmlspecialchars($editItem['name'] ?? '') ?>"
-                        placeholder="Reviewer's full name">
-                </div>
-                <div class="form-group">
-                    <label for="position">Position</label>
-                    <input type="text" id="position" name="position"
-                        value="<?= htmlspecialchars($editItem['position'] ?? '') ?>"
-                        placeholder="e.g. CEO, Client, Partner">
-                </div>
-                <div class="form-group">
-                    <label for="rate">Rating <span style="color:var(--danger)">*</span></label>
-                    <select id="rate" name="rate">
-                        <?php for ($i = 5; $i >= 1; $i--): ?>
-                        <option value="<?= $i ?>"
-                            <?= (isset($editItem['rate']) ? (int)$editItem['rate'] : 5) === $i ? 'selected' : '' ?>>
-                            <?= $i ?> Star<?= $i > 1 ? 's' : '' ?> — <?= str_repeat('★', $i) . str_repeat('☆', 5 - $i) ?>
-                        </option>
-                        <?php endfor; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="system_name">System Name</label>
-                    <input type="text" id="system_name" name="system_name"
-                        value="<?= htmlspecialchars($editItem['system_name'] ?? '') ?>"
-                        placeholder="e.g. Google, Trustpilot, Internal">
-                </div>
-                <div class="form-group full">
-                    <label for="testimonial">Testimonial <span style="color:var(--danger)">*</span></label>
-                    <textarea id="testimonial" name="testimonial" required
-                        placeholder="Write the testimonial text here..."><?= htmlspecialchars($editItem['testimonial'] ?? '') ?></textarea>
-                </div>
-                <div class="form-group full">
-                    <label for="image">Profile Image</label>
-                    <input type="file" id="image" name="image" accept="image/*">
-                    <?php if (!empty($editItem['image'])): ?>
-                    <img src="<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview" style="border-radius:50%">
-                    <small style="color:var(--muted)">Leave blank to keep current image.</small>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <?= $action === 'edit' ? 'Save Changes' : 'Add Testimonial' ?>
-                </button>
-                <a href="?testimonials" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
-    <?php endif; ?>
-
-    <div class="card">
-        <h2>All Testimonials (<?= count($testimonials) ?>)</h2>
-        <?php if (empty($testimonials)): ?>
-        <div class="empty-state">No testimonials added yet. Click "+ Add Testimonial" to get started.</div>
-        <?php else: ?>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Photo</th>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Rating</th>
-                        <th>System</th>
-                        <th>Testimonial</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($testimonials as $t): ?>
-                <tr>
-                    <td>
-                        <?php if (!empty($t['image'])): ?>
-                        <img src="<?= htmlspecialchars($t['image']) ?>" alt="" class="tbl-img">
-                        <?php else: ?>
-                        <div class="tbl-img-placeholder">&#128100;</div>
-                        <?php endif; ?>
-                    </td>
-                    <td><strong><?= htmlspecialchars($t['name']) ?></strong></td>
-                    <td><?= htmlspecialchars($t['position'] ?? '—') ?></td>
-                    <td><span class="stars"><?= renderStars((int)($t['rate'] ?? 5)) ?></span></td>
-                    <td>
-                        <?php if (!empty($t['system_name'])): ?>
-                        <span class="tag"><?= htmlspecialchars($t['system_name']) ?></span>
-                        <?php else: ?>—<?php endif; ?>
-                    </td>
-                    <td>
-                        <div class="testimonial-preview" title="<?= htmlspecialchars($t['testimonial'] ?? '') ?>">
-                            "<?= htmlspecialchars($t['testimonial'] ?? '') ?>"
-                        </div>
-                    </td>
-                    <td>
-                        <div class="actions">
-                            <a href="?testimonials&action=edit&id=<?= urlencode($t['id']) ?>"
-                               class="btn btn-secondary btn-sm">Edit</a>
-                            <a href="?testimonials&action=delete&id=<?= urlencode($t['id']) ?>"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('Delete this testimonial by <?= htmlspecialchars(addslashes($t['name'])) ?>? This cannot be undone.')">
-                               Delete
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-        <?php endif; ?>
+<!-- Actions Bar -->
+<div class="actions-bar">
+    <div style="flex-grow: 1;"></div>
+    <div>
+        <!-- Trigger Modal -->
+        <button id="addTestimonialBtn" class="btn-primary" data-modal-target="#addTestimonialModal">
+            <i class="fa-solid fa-plus"></i> Add Testimonial
+        </button>
     </div>
 </div>
-</body>
-</html>
+
+<!-- Testimonials Table -->
+<div class="card">
+    <div class="card-header">All Testimonials</div>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>System Name</th>
+                    <th>Rating</th>
+                    <th>Testimonial</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($testimonials as $t): ?>
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="avatar" style="background: #e9ecef; color: #333; overflow: hidden; width: 40px; height: 40px;">
+                                    <?php if (!empty($t['image'])): ?>
+                                        <img src="<?php echo htmlspecialchars($t['image']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                    <?php else: ?>
+                                        <i class="fa-solid fa-user" style="display: flex; justify-content: center; align-items: center; height: 100%;"></i>
+                                    <?php endif; ?>
+                                </div>
+                                <div>
+                                    <strong style="display: block; color: var(--text-color);"><?php echo htmlspecialchars($t['name']); ?></strong>
+                                    <span style="font-size: 0.85rem; color: #6c757d;"><?php echo htmlspecialchars($t['position'] ?? ''); ?></span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge" style="background-color: #eef2ff; color: #4361ee;">
+                                <?php echo htmlspecialchars($t['system_name'] ?? 'Vertex Client'); ?>
+                            </span>
+                        </td>
+                        <td>
+                            <div style="color: #f59e0b; font-size: 0.9rem;">
+                                <?php
+                                $rating = (int)($t['rate'] ?? 5);
+                                for ($i = 1; $i <= 5; $i++) {
+                                    echo ($i <= $rating) ? '<i class="fa-solid fa-star"></i>' : '<i class="fa-regular fa-star"></i>';
+                                }
+                                ?>
+                            </div>
+                        </td>
+                        <td style="max-width: 300px;">
+                            <div title="<?php echo htmlspecialchars($t['testimonial']); ?>"
+                                style="display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #4b5563; font-style: italic;">
+                                "<?php echo htmlspecialchars($t['testimonial']); ?>"
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="icon-btn edit-testimonial-btn"
+                                    data-id="<?php echo $t['id']; ?>"
+                                    data-name="<?php echo htmlspecialchars($t['name']); ?>"
+                                    data-position="<?php echo htmlspecialchars($t['position'] ?? ''); ?>"
+                                    data-system-name="<?php echo htmlspecialchars($t['system_name'] ?? ''); ?>"
+                                    data-rating="<?php echo $rating; ?>"
+                                    data-testimonial="<?php echo htmlspecialchars($t['testimonial']); ?>"
+                                    data-image="<?php echo htmlspecialchars($t['image'] ?? ''); ?>"
+                                    title="Edit"
+                                    style="font-size: 0.8rem; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
+                                    Edit
+                                </button>
+                                <button class="icon-btn delete-testimonial-btn"
+                                    data-id="<?php echo $t['id']; ?>"
+                                    title="Delete"
+                                    style="font-size: 0.8rem; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; color: #ef4444;">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+
+                <?php if (empty($testimonials)): ?>
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <i class="fa-regular fa-folder-open" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            No testimonials found.
+                        </td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Testimonial Modal -->
+<div id="addTestimonialModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Add Testimonial</h3>
+            <button class="modal-close" data-modal-close>&times;</button>
+        </div>
+        <div class="modal-body">
+            <form action="?testimonials" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="store">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Client Name <span class="required">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Ana Dela Cruz" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position</label>
+                        <input type="text" name="position" class="form-control" placeholder="e.g. Chief Finance Officer">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">System Name</label>
+                        <input type="text" name="system_name" class="form-control" placeholder="e.g. Vertex ERP">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Rating (1-5) <span class="required">*</span></label>
+                        <input type="number" name="rate" class="form-control" min="1" max="5" value="5" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Testimonial <span class="required">*</span></label>
+                    <textarea name="testimonial" class="form-control" rows="2" placeholder="Enter the client's testimonial here..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Client Image</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" accept="image/*">
+                        <div class="file-input-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click or Drag to Upload Client Image</span>
+                        </div>
+                    </div>
+                    <p class="form-text">Recommended size: 100x100px. Max size: 2MB.</p>
+                </div>
+
+                <div class="form-actions" style="margin-top: 20px; padding-top: 0; border-top: none;">
+                    <button type="button" class="btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="btn-primary">Save Testimonial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Testimonial Modal -->
+<div id="editTestimonialModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit Testimonial</h3>
+            <button class="modal-close" data-modal-close>&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="editTestimonialForm" action="?testimonials" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="update"> <!-- Or handled by ID presence -->
+                <input type="hidden" name="id" id="edit_id">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Client Name <span class="required">*</span></label>
+                        <input type="text" name="name" id="edit_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Position</label>
+                        <input type="text" name="position" id="edit_position" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">System Name</label>
+                        <input type="text" name="system_name" id="edit_system_name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Rating (1-5) <span class="required">*</span></label>
+                        <input type="number" name="rate" id="edit_rating" class="form-control" min="1" max="5" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Testimonial <span class="required">*</span></label>
+                    <textarea name="testimonial" id="edit_testimonial" class="form-control" rows="2" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Client Image</label>
+                    <div id="current_image_preview" style="margin-bottom: 10px; display: none;">
+                        <img src="" style="max-height: 80px; border-radius: 6px;">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image</span>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" accept="image/*">
+                        <div class="file-input-label">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Click or Drag to Upload New Image</span>
+                        </div>
+                    </div>
+                    <p class="form-text">Leave blank to keep current image. Recommended size: 100x100px.</p>
+                </div>
+
+                <div class="form-actions" style="margin-top: 20px; padding-top: 0; border-top: none;">
+                    <button type="button" class="btn-secondary" data-modal-close>Cancel</button>
+                    <button type="submit" class="btn-primary">Update Testimonial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteTestimonialModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <div class="modal-body" style="padding: 30px;">
+            <div style="width: 60px; height: 60px; background-color: #fee2e2; color: #ef4444; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 20px;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="modal-title" style="margin-bottom: 10px; font-size: 1.25rem;">Delete Testimonial?</h3>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Are you sure you want to delete this testimonial? This action cannot be undone.</p>
+
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" class="btn-secondary" data-modal-close>Cancel</button>
+                <a href="#" id="confirmDeleteBtn" class="btn-primary" style="background-color: #ef4444; border: none; color: white;">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php include __DIR__ . '/../partials/footer.php'; ?>
