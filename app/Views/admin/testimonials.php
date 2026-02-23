@@ -32,15 +32,22 @@
             </thead>
             <tbody>
                 <?php foreach ($testimonials as $t): ?>
-                    <tr>
+                    <?php $rating = (int)($t['rate'] ?? 5); ?>
+                    <tr class="testimonial-row" 
+                        data-name="<?php echo htmlspecialchars($t['name']); ?>"
+                        data-position="<?php echo htmlspecialchars($t['position'] ?? ''); ?>"
+                        data-system-name="<?php echo htmlspecialchars($t['system_name'] ?? 'Vertex ERP Client'); ?>"
+                        data-rating="<?php echo $rating; ?>"
+                        data-testimonial="<?php echo htmlspecialchars($t['testimonial']); ?>"
+                        data-image="<?php echo !empty($t['image']) ? htmlspecialchars('public/' . $t['image']) : ''; ?>"
+                        data-verified="true">
                         <td>
-                            <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="testimonial-client-info" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
                                 <div class="avatar" style="background: #e9ecef; color: #333; overflow: hidden;">
                                     <?php if (!empty($t['image'])): ?>
                                         <img src="public/<?php echo htmlspecialchars($t['image']); ?>" 
                                              alt="<?php echo htmlspecialchars($t['name']); ?>"
-                                             style="width: 100%; height: 100%; object-fit: cover;"
-                                             onclick="openImageModal(this.src)">
+                                             style="width: 100%; height: 100%; object-fit: cover;">
                                     <?php else: ?>
                                         <i class="fa-solid fa-user" style="display: flex; justify-content: center; align-items: center; height: 100%;"></i>
                                     <?php endif; ?>
@@ -210,8 +217,8 @@
                 <div class="form-group">
                     <label class="form-label">Client Image</label>
                     <div id="current_image_preview" style="margin-bottom: 10px; display: none;">
-                        <img src="" style="max-height: 120px; border-radius: 6px; cursor: pointer;" onclick="openImageModal(this.src)">
-                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image (click to enlarge)</span>
+                        <img src="" style="max-height: 120px; border-radius: 6px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.03)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image</span>
                     </div>
                     <div class="file-input-wrapper">
                         <input type="file" name="image" accept="image/*">
@@ -254,6 +261,43 @@
 <div id="imageModal" class="image-modal" onclick="closeImageModal()">
     <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
     <img class="image-modal-content" id="modalImage">
+</div>
+
+<!-- Testimonial Detail Modal -->
+<div id="testimonialDetailModal" class="testimonial-modal-overlay">
+    <div class="testimonial-modal-backdrop"></div>
+    <div class="testimonial-modal-card">
+        <button class="testimonial-modal-close" id="closeTestimonialModal">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div class="testimonial-quote-icon">
+            <i class="fa-solid fa-quote-right"></i>
+        </div>
+        
+        <div class="testimonial-modal-header">
+            <div class="testimonial-avatar-wrapper">
+                <img id="modalClientAvatar" src="" alt="Client Avatar">
+            </div>
+            <div class="testimonial-client-details">
+                <h3 id="modalClientName"></h3>
+                <p id="modalClientPosition"></p>
+                <div class="testimonial-stars" id="modalClientRating"></div>
+            </div>
+        </div>
+        
+        <div class="testimonial-modal-body">
+            <p id="modalClientTestimonial"></p>
+        </div>
+        
+        <div class="testimonial-modal-footer">
+            <div class="testimonial-client-badge" id="modalClientBadge"></div>
+            <div class="testimonial-verified">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Verified</span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

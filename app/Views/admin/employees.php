@@ -55,8 +55,7 @@
                             <div class="avatar" style="background: #e9ecef; color: #333; overflow: hidden; width: 60px; height: 60px;">
                                 <?php if (!empty($emp['image'])): ?>
                                     <img src="public/<?php echo htmlspecialchars($emp['image']); ?>" 
-                                         style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
-                                         onclick="openImageModal(this.src)">
+                                         style="width: 100%; height: 100%; object-fit: cover;">
                                 <?php else: ?>
                                     <?php echo substr($emp['name'], 0, 1); ?>
                                 <?php endif; ?>
@@ -91,6 +90,18 @@
                         </td>
                         <td>
                             <div style="display: flex; gap: 5px;">
+                                <button class="icon-btn view-employee-btn"
+                                    data-id="<?php echo $emp['id']; ?>"
+                                    data-name="<?php echo htmlspecialchars($emp['name']); ?>"
+                                    data-position="<?php echo htmlspecialchars($emp['position'] ?? ''); ?>"
+                                    data-description="<?php echo htmlspecialchars($emp['description'] ?? ''); ?>"
+                                    data-email="<?php echo htmlspecialchars($emp['email'] ?? ''); ?>"
+                                    data-linkedin="<?php echo htmlspecialchars($emp['linkedin'] ?? ''); ?>"
+                                    data-image="<?php echo !empty($emp['image']) ? htmlspecialchars('public/' . $emp['image']) : ''; ?>"
+                                    title="View Details"
+                                    style="font-size: 0.8rem; border: 1px solid var(--primary-color); padding: 4px 8px; border-radius: 4px; color: var(--primary-color);">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
                                 <button class="icon-btn edit-employee-btn"
                                     data-id="<?php echo $emp['id']; ?>"
                                     data-name="<?php echo htmlspecialchars($emp['name']); ?>"
@@ -229,8 +240,8 @@
                 <div class="form-group">
                     <label class="form-label">Employee Image</label>
                     <div id="current_emp_image_preview" style="margin-bottom: 10px; display: none;">
-                        <img src="" style="max-height: 120px; border-radius: 6px; cursor: pointer;" onclick="openImageModal(this.src)">
-                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image (click to enlarge)</span>
+                        <img src="" style="max-height: 120px; border-radius: 6px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.03)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image</span>
                     </div>
                     <div class="file-input-wrapper">
                         <input type="file" name="image" accept="image/*">
@@ -275,6 +286,37 @@
     <img class="image-modal-content" id="modalImage">
 </div>
 
+<!-- Employee Detail Modal -->
+<div id="employeeDetailModal" class="employee-detail-modal">
+    <div class="employee-detail-overlay" onclick="closeEmployeeDetailModal()"></div>
+    <div class="employee-detail-card">
+        <button class="employee-detail-close" onclick="closeEmployeeDetailModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div class="employee-detail-image">
+            <img id="detailEmployeeImage" src="" alt="Employee Photo">
+        </div>
+        
+        <div class="employee-detail-content">
+            <h2 id="detailEmployeeName" class="employee-detail-name"></h2>
+            <span id="detailEmployeePosition" class="employee-detail-position"></span>
+            <p id="detailEmployeeDescription" class="employee-detail-description"></p>
+            
+            <div class="employee-detail-socials">
+                <a id="detailEmployeeEmail" href="" class="employee-social-btn email-btn" style="display: none;">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Email</span>
+                </a>
+                <a id="detailEmployeeLinkedIn" href="" target="_blank" class="employee-social-btn linkedin-btn" style="display: none;">
+                    <i class="fa-brands fa-linkedin"></i>
+                    <span>LinkedIn</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function openImageModal(src) {
     document.getElementById('imageModal').style.display = 'block';
@@ -285,8 +327,75 @@ function closeImageModal() {
     document.getElementById('imageModal').style.display = 'none';
 }
 
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeImageModal();
+function openEmployeeDetailModal(employee) {
+    const modal = document.getElementById('employeeDetailModal');
+    const body = document.body;
+    
+    // Populate modal data
+    const defaultImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%23e0e7ff"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="120" fill="%234361ee"%3E' + (employee.name ? employee.name.charAt(0).toUpperCase() : '?') + '%3C/text%3E%3C/svg%3E';
+    
+    document.getElementById('detailEmployeeImage').src = employee.image || defaultImage;
+    document.getElementById('detailEmployeeName').textContent = employee.name || 'Unknown';
+    document.getElementById('detailEmployeePosition').textContent = employee.position || 'N/A';
+    document.getElementById('detailEmployeeDescription').textContent = employee.description || 'No description available.';
+    
+    // Handle email button
+    const emailBtn = document.getElementById('detailEmployeeEmail');
+    if (employee.email) {
+        emailBtn.href = 'mailto:' + employee.email;
+        emailBtn.style.display = 'flex';
+    } else {
+        emailBtn.style.display = 'none';
+    }
+    
+    // Handle LinkedIn button
+    const linkedInBtn = document.getElementById('detailEmployeeLinkedIn');
+    if (employee.linkedin) {
+        linkedInBtn.href = employee.linkedin;
+        linkedInBtn.style.display = 'flex';
+    } else {
+        linkedInBtn.style.display = 'none';
+    }
+    
+    // Show modal with animation
+    modal.classList.add('show');
+    body.style.overflow = 'hidden';
+}
+
+function closeEmployeeDetailModal() {
+    const modal = document.getElementById('employeeDetailModal');
+    const body = document.body;
+    
+    modal.classList.remove('show');
+    body.style.overflow = '';
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // View employee detail buttons
+    const viewBtns = document.querySelectorAll('.view-employee-btn');
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const employee = {
+                id: this.dataset.id,
+                name: this.dataset.name,
+                position: this.dataset.position,
+                description: this.dataset.description,
+                email: this.dataset.email,
+                linkedin: this.dataset.linkedin,
+                image: this.dataset.image
+            };
+            openEmployeeDetailModal(employee);
+        });
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeImageModal();
+            closeEmployeeDetailModal();
+        }
+    });
 });
 </script>
 

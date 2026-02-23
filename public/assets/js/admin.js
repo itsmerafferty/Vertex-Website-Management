@@ -345,3 +345,111 @@ submenuToggles.forEach(toggle => {
         }
     }
 });
+
+// ===================================================
+// TESTIMONIAL DETAIL MODAL
+// ===================================================
+
+// Open testimonial detail modal when clicking on testimonial rows
+const testimonialRows = document.querySelectorAll('.testimonial-row');
+const testimonialModal = document.getElementById('testimonialDetailModal');
+const closeTestimonialModalBtn = document.getElementById('closeTestimonialModal');
+const testimonialBackdrop = document.querySelector('.testimonial-modal-backdrop');
+
+if (testimonialRows.length > 0 && testimonialModal) {
+    testimonialRows.forEach(row => {
+        // Only add click listener to the client info section, not action buttons
+        const clientInfo = row.querySelector('.testimonial-client-info');
+        if (clientInfo) {
+            clientInfo.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openTestimonialModal(row);
+            });
+        }
+        
+        // Also allow clicking on the avatar
+        const avatar = row.querySelector('.avatar');
+        if (avatar) {
+            avatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                openTestimonialModal(row);
+            });
+        }
+    });
+    
+    // Close modal handlers
+    if (closeTestimonialModalBtn) {
+        closeTestimonialModalBtn.addEventListener('click', closeTestimonialModal);
+    }
+    
+    if (testimonialBackdrop) {
+        testimonialBackdrop.addEventListener('click', closeTestimonialModal);
+    }
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && testimonialModal && testimonialModal.classList.contains('show')) {
+            closeTestimonialModal();
+        }
+    });
+}
+
+function openTestimonialModal(row) {
+    const modal = document.getElementById('testimonialDetailModal');
+    if (!modal) return;
+    
+    // Extract data from row's dataset
+    const name = row.dataset.name || 'Client Name';
+    const position = row.dataset.position || 'Position';
+    const systemName = row.dataset.systemName || 'Vertex ERP Client';
+    const rating = parseInt(row.dataset.rating) || 5;
+    const testimonial = row.dataset.testimonial || '';
+    const image = row.dataset.image || '';
+    const verified = row.dataset.verified === 'true';
+    
+    // Populate modal content
+    document.getElementById('modalClientName').textContent = name;
+    document.getElementById('modalClientPosition').textContent = position;
+    document.getElementById('modalClientTestimonial').textContent = testimonial;
+    document.getElementById('modalClientBadge').textContent = systemName;
+    
+    // Set avatar
+    const avatarImg = document.getElementById('modalClientAvatar');
+    if (image) {
+        avatarImg.src = image;
+        avatarImg.style.display = 'block';
+    } else {
+        avatarImg.style.display = 'none';
+    }
+    
+    // Generate star rating
+    const ratingContainer = document.getElementById('modalClientRating');
+    ratingContainer.innerHTML = '';
+    for (let i = 1; i <= 5; i++) {
+        const star = document.createElement('i');
+        if (i <= rating) {
+            star.className = 'fa-solid fa-star';
+        } else {
+            star.className = 'fa-regular fa-star';
+        }
+        ratingContainer.appendChild(star);
+    }
+    
+    // Show verified badge
+    const verifiedBadge = document.querySelector('.testimonial-verified');
+    if (verifiedBadge) {
+        verifiedBadge.style.display = verified ? 'flex' : 'none';
+    }
+    
+    // Show modal
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeTestimonialModal() {
+    const modal = document.getElementById('testimonialDetailModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+    }
+}

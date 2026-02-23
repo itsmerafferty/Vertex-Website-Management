@@ -88,7 +88,8 @@ if ($basePath === '/') $basePath = '';
         input:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
         textarea { resize: vertical; min-height: 80px; }
         .form-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
-        .img-preview { width: 120px; height: 120px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--border); margin-top: 0.25rem; }
+        .img-preview { width: 120px; height: 120px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--border); margin-top: 0.25rem; transition: transform 0.2s, box-shadow 0.2s; }
+        .img-preview:hover { transform: scale(1.03); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         thead th { text-align: left; padding: 0.6rem 0.75rem; background: var(--bg); border-bottom: 2px solid var(--border); font-weight: 600; color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -96,8 +97,8 @@ if ($basePath === '/') $basePath = '';
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #fafafa; }
         tbody td { padding: 0.75rem; vertical-align: middle; }
-        .tbl-img { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
-        .tbl-img:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .tbl-img { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); transition: transform 0.2s, box-shadow 0.2s; }
+        .tbl-img:hover { transform: scale(1.03); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .tbl-img-placeholder { width: 80px; height: 80px; background: #e0e7ff; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary); }
         .image-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
         .image-modal-content { margin: auto; display: block; max-width: 90%; max-height: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
@@ -164,8 +165,8 @@ include __DIR__ . '/_sidebar.php';
                     <label for="image">Profile Image</label>
                     <input type="file" id="image" name="image" accept="image/*">
                     <?php if (!empty($editItem['image'])): ?>
-                    <img src="public/<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview" onclick="openImageModal(this.src)" style="cursor: pointer;">
-                    <small style="color:var(--muted); display:block;">Click image to enlarge. Leave blank to keep current image.</small>
+                    <img src="public/<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview">
+                    <small style="color:var(--muted); display:block;">Leave blank to keep current image.</small>
                     <?php endif; ?>
                 </div>
             </div>
@@ -202,7 +203,7 @@ include __DIR__ . '/_sidebar.php';
                 <tr>
                     <td>
                         <?php if (!empty($emp['image'])): ?>
-                        <img src="public/<?= htmlspecialchars($emp['image']) ?>" alt="<?= htmlspecialchars($emp['name']) ?>" class="tbl-img" onclick="openImageModal(this.src)">
+                        <img src="public/<?= htmlspecialchars($emp['image']) ?>" alt="<?= htmlspecialchars($emp['name']) ?>" class="tbl-img">
                         <?php else: ?>
                         <div class="tbl-img-placeholder">&#128100;</div>
                         <?php endif; ?>
@@ -221,6 +222,15 @@ include __DIR__ . '/_sidebar.php';
                     </td>
                     <td>
                         <div class="actions">
+                            <button class="btn btn-primary btn-sm view-employee-btn"
+                                data-name="<?= htmlspecialchars($emp['name']) ?>"
+                                data-position="<?= htmlspecialchars($emp['position']) ?>"
+                                data-description="<?= htmlspecialchars($emp['description']) ?>"
+                                data-email="<?= htmlspecialchars($emp['email'] ?? '') ?>"
+                                data-linkedin="<?= htmlspecialchars($emp['linkedin'] ?? '') ?>"
+                                data-image="<?= !empty($emp['image']) ? htmlspecialchars('public/' . $emp['image']) : '' ?>">
+                                <i class="fa-solid fa-eye"></i> View
+                            </button>
                             <a href="?regular_employees&action=edit&id=<?= urlencode($emp['id']) ?>"
                                class="btn btn-secondary btn-sm">Edit</a>
                             <a href="?regular_employees&action=delete&id=<?= urlencode($emp['id']) ?>"
@@ -245,6 +255,37 @@ include __DIR__ . '/_sidebar.php';
     <img class="image-modal-content" id="modalImage">
 </div>
 
+<!-- Employee Detail Modal -->
+<div id="employeeDetailModal" class="employee-detail-modal">
+    <div class="employee-detail-overlay" onclick="closeEmployeeDetailModal()"></div>
+    <div class="employee-detail-card">
+        <button class="employee-detail-close" onclick="closeEmployeeDetailModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        
+        <div class="employee-detail-image">
+            <img id="detailEmployeeImage" src="" alt="Employee Photo">
+        </div>
+        
+        <div class="employee-detail-content">
+            <h2 id="detailEmployeeName" class="employee-detail-name"></h2>
+            <span id="detailEmployeePosition" class="employee-detail-position"></span>
+            <p id="detailEmployeeDescription" class="employee-detail-description"></p>
+            
+            <div class="employee-detail-socials">
+                <a id="detailEmployeeEmail" href="" class="employee-social-btn email-btn" style="display: none;">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>Email</span>
+                </a>
+                <a id="detailEmployeeLinkedIn" href="" target="_blank" class="employee-social-btn linkedin-btn" style="display: none;">
+                    <i class="fa-brands fa-linkedin"></i>
+                    <span>LinkedIn</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 function openImageModal(src) {
     document.getElementById('imageModal').style.display = 'block';
@@ -255,8 +296,73 @@ function closeImageModal() {
     document.getElementById('imageModal').style.display = 'none';
 }
 
+function openEmployeeDetailModal(employee) {
+    const modal = document.getElementById('employeeDetailModal');
+    const body = document.body;
+    
+    // Populate modal data
+    const defaultImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"%3E%3Crect width="400" height="400" fill="%23e0e7ff"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="120" fill="%234361ee"%3E' + (employee.name ? employee.name.charAt(0).toUpperCase() : '?') + '%3C/text%3E%3C/svg%3E';
+    
+    document.getElementById('detailEmployeeImage').src = employee.image || defaultImage;
+    document.getElementById('detailEmployeeName').textContent = employee.name || 'Unknown';
+    document.getElementById('detailEmployeePosition').textContent = employee.position || 'N/A';
+    document.getElementById('detailEmployeeDescription').textContent = employee.description || 'No description available.';
+    
+    // Handle email button
+    const emailBtn = document.getElementById('detailEmployeeEmail');
+    if (employee.email) {
+        emailBtn.href = 'mailto:' + employee.email;
+        emailBtn.style.display = 'flex';
+    } else {
+        emailBtn.style.display = 'none';
+    }
+    
+    // Handle LinkedIn button
+    const linkedInBtn = document.getElementById('detailEmployeeLinkedIn');
+    if (employee.linkedin) {
+        linkedInBtn.href = employee.linkedin;
+        linkedInBtn.style.display = 'flex';
+    } else {
+        linkedInBtn.style.display = 'none';
+    }
+    
+    // Show modal with animation
+    modal.classList.add('show');
+    body.style.overflow = 'hidden';
+}
+
+function closeEmployeeDetailModal() {
+    const modal = document.getElementById('employeeDetailModal');
+    const body = document.body;
+    
+    modal.classList.remove('show');
+    body.style.overflow = '';
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // View employee detail buttons
+    const viewBtns = document.querySelectorAll('.view-employee-btn');
+    viewBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const employee = {
+                name: this.dataset.name,
+                position: this.dataset.position,
+                description: this.dataset.description,
+                email: this.dataset.email,
+                linkedin: this.dataset.linkedin,
+                image: this.dataset.image
+            };
+            openEmployeeDetailModal(employee);
+        });
+    });
+});
+
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeImageModal();
+    if (e.key === 'Escape') {
+        closeImageModal();
+        closeEmployeeDetailModal();
+    }
 });
 </script>
 
