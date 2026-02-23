@@ -35,9 +35,12 @@
                     <tr>
                         <td>
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <div class="avatar" style="background: #e9ecef; color: #333; overflow: hidden; width: 40px; height: 40px;">
+                                <div class="avatar" style="background: #e9ecef; color: #333; overflow: hidden;">
                                     <?php if (!empty($t['image'])): ?>
-                                        <img src="<?php echo htmlspecialchars($t['image']); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="public/<?php echo htmlspecialchars($t['image']); ?>" 
+                                             alt="<?php echo htmlspecialchars($t['name']); ?>"
+                                             style="width: 100%; height: 100%; object-fit: cover;"
+                                             onclick="openImageModal(this.src)">
                                     <?php else: ?>
                                         <i class="fa-solid fa-user" style="display: flex; justify-content: center; align-items: center; height: 100%;"></i>
                                     <?php endif; ?>
@@ -78,7 +81,7 @@
                                     data-system-name="<?php echo htmlspecialchars($t['system_name'] ?? ''); ?>"
                                     data-rating="<?php echo $rating; ?>"
                                     data-testimonial="<?php echo htmlspecialchars($t['testimonial']); ?>"
-                                    data-image="<?php echo htmlspecialchars($t['image'] ?? ''); ?>"
+                                    data-image="<?php echo !empty($t['image']) ? htmlspecialchars('public/' . $t['image']) : ''; ?>"
                                     title="Edit"
                                     style="font-size: 0.8rem; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px;">
                                     Edit
@@ -207,8 +210,8 @@
                 <div class="form-group">
                     <label class="form-label">Client Image</label>
                     <div id="current_image_preview" style="margin-bottom: 10px; display: none;">
-                        <img src="" style="max-height: 80px; border-radius: 6px;">
-                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image</span>
+                        <img src="" style="max-height: 120px; border-radius: 6px; cursor: pointer;" onclick="openImageModal(this.src)">
+                        <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Current Image (click to enlarge)</span>
                     </div>
                     <div class="file-input-wrapper">
                         <input type="file" name="image" accept="image/*">
@@ -246,5 +249,26 @@
         </div>
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="modalImage">
+</div>
+
+<script>
+function openImageModal(src) {
+    document.getElementById('imageModal').style.display = 'block';
+    document.getElementById('modalImage').src = src;
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeImageModal();
+});
+</script>
 
 <?php include __DIR__ . '/../partials/footer.php'; ?>
