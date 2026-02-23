@@ -1,6 +1,7 @@
 <?php
 $title = 'Dashboard — Vertex Admin';
 include __DIR__ . '/../partials/header.php';
+
 ?>
 
 <div class="page-header">
