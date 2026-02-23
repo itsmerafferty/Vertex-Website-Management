@@ -1,29 +1,20 @@
 [
     {
-        "id": "emp_6997da8d1cd3a",
-        "image": "",
-        "name": "John Smith",
-        "position": "developer",
-        "description": "",
-        "email": "johndoe@gmail.com",
+        "id": "emp_699bc60408cbb",
+        "image": "uploads\/emp_699bc6040891e.webp",
+        "name": "josipina",
+        "position": "web developer",
+        "description": "nvuuttyf",
+        "email": "johndoe66@gmail.com",
         "linkedin": "https:\/\/www.linkedin.com\/feed\/"
     },
     {
-        "id": "emp_6997dac1b7c02",
-        "image": "",
-        "name": "John doe",
-        "position": "developer",
-        "description": "",
-        "email": "johndoe@gmail.com",
+        "id": "emp_699bc71cadcab",
+        "image": "uploads\/emp_699bc71cad882.jpg",
+        "name": "John Doe",
+        "position": "web developer",
+        "description": "ssssssssssssssssssss",
+        "email": "johndo6@gmail.com",
         "linkedin": "https:\/\/www.linkedin.com\/feed\/"
-    },
-    {
-        "id": "emp_6997f04444a21",
-        "image": "uploads\/emp_6997f04444458.png",
-        "name": "Johnson",
-        "position": "finance",
-        "description": "rfdfersdfcresdfc",
-        "email": "johnson@gmail.com",
-        "linkedin": ""
     }
 ]

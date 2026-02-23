@@ -1,3 +1,8 @@
+<?php
+$basePath = dirname($_SERVER['SCRIPT_NAME']);
+$basePath = str_replace('\\', '/', $basePath);
+if ($basePath === '/') $basePath = '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -246,8 +251,8 @@ include __DIR__ . '/_sidebar.php';
                     <label for="image">Profile Image</label>
                     <input type="file" id="image" name="image" accept="image/*">
                     <?php if (!empty($editItem['image'])): ?>
-                    <img src="<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview">
-                    <small style="color:var(--muted)">Leave blank to keep current image.</small>
+                    <img src="public/<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview" onclick="openImageModal(this.src)" style="cursor: pointer;">
+                    <small style="color:var(--muted); display:block;">Click image to enlarge. Leave blank to keep current image.</small>
                     <?php endif; ?>
                 </div>
             </div>
@@ -284,7 +289,7 @@ include __DIR__ . '/_sidebar.php';
                 <tr>
                     <td>
                         <?php if (!empty($emp['image'])): ?>
-                        <img src="<?= htmlspecialchars($emp['image']) ?>" alt="" class="tbl-img">
+                        <img src="public/<?= htmlspecialchars($emp['image']) ?>" alt="<?= htmlspecialchars($emp['name']) ?>" class="tbl-img" onclick="openImageModal(this.src)">
                         <?php else: ?>
                         <div class="tbl-img-placeholder">&#128100;</div>
                         <?php endif; ?>
@@ -322,5 +327,27 @@ include __DIR__ . '/_sidebar.php';
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="modalImage">
+</div>
+
+<script>
+function openImageModal(src) {
+    document.getElementById('imageModal').style.display = 'block';
+    document.getElementById('modalImage').src = src;
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeImageModal();
+});
+</script>
+
 </body>
 </html>

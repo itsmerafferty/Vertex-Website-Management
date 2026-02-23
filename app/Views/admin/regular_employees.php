@@ -1,3 +1,8 @@
+<?php
+$basePath = dirname($_SERVER['SCRIPT_NAME']);
+$basePath = str_replace('\\', '/', $basePath);
+if ($basePath === '/') $basePath = '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,7 +88,7 @@
         input:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
         textarea { resize: vertical; min-height: 80px; }
         .form-actions { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
-        .img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--border); margin-top: 0.25rem; }
+        .img-preview { width: 120px; height: 120px; object-fit: cover; border-radius: var(--radius); border: 2px solid var(--border); margin-top: 0.25rem; }
         .table-wrap { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         thead th { text-align: left; padding: 0.6rem 0.75rem; background: var(--bg); border-bottom: 2px solid var(--border); font-weight: 600; color: var(--muted); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.04em; }
@@ -91,8 +96,13 @@
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #fafafa; }
         tbody td { padding: 0.75rem; vertical-align: middle; }
-        .tbl-img { width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); }
-        .tbl-img-placeholder { width: 48px; height: 48px; background: #e0e7ff; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--primary); }
+        .tbl-img { width: 80px; height: 80px; object-fit: cover; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer; transition: transform 0.2s; }
+        .tbl-img:hover { transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .tbl-img-placeholder { width: 80px; height: 80px; background: #e0e7ff; border-radius: var(--radius); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary); }
+        .image-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); }
+        .image-modal-content { margin: auto; display: block; max-width: 90%; max-height: 90%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .image-modal-close { position: absolute; top: 20px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
+        .image-modal-close:hover { color: #bbb; }
         .actions { display: flex; gap: 0.5rem; }
         .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.95rem; }
     </style>
@@ -154,8 +164,8 @@ include __DIR__ . '/_sidebar.php';
                     <label for="image">Profile Image</label>
                     <input type="file" id="image" name="image" accept="image/*">
                     <?php if (!empty($editItem['image'])): ?>
-                    <img src="<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview">
-                    <small style="color:var(--muted)">Leave blank to keep current image.</small>
+                    <img src="public/<?= htmlspecialchars($editItem['image']) ?>" alt="Current" class="img-preview" onclick="openImageModal(this.src)" style="cursor: pointer;">
+                    <small style="color:var(--muted); display:block;">Click image to enlarge. Leave blank to keep current image.</small>
                     <?php endif; ?>
                 </div>
             </div>
@@ -192,7 +202,7 @@ include __DIR__ . '/_sidebar.php';
                 <tr>
                     <td>
                         <?php if (!empty($emp['image'])): ?>
-                        <img src="<?= htmlspecialchars($emp['image']) ?>" alt="" class="tbl-img">
+                        <img src="public/<?= htmlspecialchars($emp['image']) ?>" alt="<?= htmlspecialchars($emp['name']) ?>" class="tbl-img" onclick="openImageModal(this.src)">
                         <?php else: ?>
                         <div class="tbl-img-placeholder">&#128100;</div>
                         <?php endif; ?>
@@ -228,5 +238,27 @@ include __DIR__ . '/_sidebar.php';
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Image Modal -->
+<div id="imageModal" class="image-modal" onclick="closeImageModal()">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="modalImage">
+</div>
+
+<script>
+function openImageModal(src) {
+    document.getElementById('imageModal').style.display = 'block';
+    document.getElementById('modalImage').src = src;
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeImageModal();
+});
+</script>
+
 </body>
 </html>
