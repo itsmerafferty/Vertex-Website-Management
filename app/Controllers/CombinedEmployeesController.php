@@ -59,6 +59,16 @@ class CombinedEmployeesController
 
         if ($action === 'delete' && !empty($_GET['id'])) {
             $id        = $_GET['id'];
+            // Delete associated image before removing employee
+            foreach ($employees as $emp) {
+                if ($emp['id'] === $id && !empty($emp['image'])) {
+                    $imagePath = __DIR__ . '/../../public/' . $emp['image'];
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                    break;
+                }
+            }
             $employees = array_values(array_filter($employees, fn($e) => $e['id'] !== $id));
             $this->persist($employees);
             header("Location: ?employees&filter={$filter}");
@@ -91,7 +101,16 @@ class CombinedEmployeesController
                         $emp['description'] = $description;
                         $emp['email']       = $email;
                         $emp['linkedin']    = $linkedin;
-                        if ($imagePath) $emp['image'] = $imagePath;
+                        if ($imagePath) {
+                            // Delete old image if exists
+                            if (!empty($emp['image'])) {
+                                $oldImagePath = __DIR__ . '/../../public/' . $emp['image'];
+                                if (file_exists($oldImagePath)) {
+                                    unlink($oldImagePath);
+                                }
+                            }
+                            $emp['image'] = $imagePath;
+                        }
                         break;
                     }
                 }

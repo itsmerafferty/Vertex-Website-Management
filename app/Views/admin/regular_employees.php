@@ -212,12 +212,12 @@ include __DIR__ . '/_sidebar.php';
                     <td><?= htmlspecialchars($emp['position']) ?></td>
                     <td>
                         <?php if (!empty($emp['email'])): ?>
-                        <a href="mailto:<?= htmlspecialchars($emp['email']) ?>" style="color:var(--primary)"><?= htmlspecialchars($emp['email']) ?></a>
+                        <?= htmlspecialchars($emp['email']) ?>
                         <?php else: ?>—<?php endif; ?>
                     </td>
                     <td>
                         <?php if (!empty($emp['linkedin'])): ?>
-                        <a href="<?= htmlspecialchars($emp['linkedin']) ?>" target="_blank" style="color:var(--primary)">View</a>
+                        <?= htmlspecialchars($emp['linkedin']) ?>
                         <?php else: ?>—<?php endif; ?>
                     </td>
                     <td>

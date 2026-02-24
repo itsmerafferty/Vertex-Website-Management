@@ -39,6 +39,16 @@ class TestimonialController {
 
         if ($action === 'delete' && !empty($_GET['id'])) {
             $id = $_GET['id'];
+            // Delete associated image before removing testimonial
+            foreach ($testimonials as $t) {
+                if ($t['id'] === $id && !empty($t['image'])) {
+                    $imagePath = __DIR__ . '/../../public/' . $t['image'];
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                    break;
+                }
+            }
             $testimonials = array_values(array_filter($testimonials, fn($t) => $t['id'] !== $id));
             $this->persist($testimonials);
             header('Location: ?testimonials');
@@ -68,7 +78,16 @@ class TestimonialController {
                         $t['rate']        = $rate;
                         $t['testimonial'] = $testimonial;
                         $t['system_name'] = $systemName;
-                        if ($imagePath) $t['image'] = $imagePath;
+                        if ($imagePath) {
+                            // Delete old image if exists
+                            if (!empty($t['image'])) {
+                                $oldImagePath = __DIR__ . '/../../public/' . $t['image'];
+                                if (file_exists($oldImagePath)) {
+                                    unlink($oldImagePath);
+                                }
+                            }
+                            $t['image'] = $imagePath;
+                        }
                         break;
                     }
                 }

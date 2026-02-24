@@ -72,18 +72,14 @@
                         </td>
                         <td>
                             <?php if (!empty($emp['email'])): ?>
-                                <a href="mailto:<?php echo htmlspecialchars($emp['email']); ?>" style="color: var(--primary-color); text-decoration: none; display: flex; align-items: center; gap: 5px;">
-                                    <i class="fa-solid fa-envelope"></i> Link
-                                </a>
+                                <?php echo htmlspecialchars($emp['email']); ?>
                             <?php else: ?>
                                 <span style="color: var(--text-muted);">-</span>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if (!empty($emp['linkedin'])): ?>
-                                <a href="<?php echo htmlspecialchars($emp['linkedin']); ?>" target="_blank" style="color: #0077b5; text-decoration: none; display: flex; align-items: center; gap: 5px;">
-                                    <i class="fa-brands fa-linkedin"></i> LinkedIn
-                                </a>
+                                <?php echo htmlspecialchars($emp['linkedin']); ?>
                             <?php else: ?>
                                 <span style="color: var(--text-muted);">-</span>
                             <?php endif; ?>
